@@ -87,7 +87,7 @@ class ModelWithLog(models.Model):
             modifications = self.__modifications__()
             change_message = change_message or self.make_log_message()
             saved = super(ModelWithLog, self).save(*args, **kwargs)
-        RegistreLog.objects.log_action(
+        RegisterLog.objects.log_action(
             content_type=content_type,
             object_pk=self.pk,
             object_repr=str(self),
@@ -116,7 +116,7 @@ class ModelWithLog(models.Model):
 
     def delete(self, *args, **kwargs):
         self.__action_flag__ = ACTION_DELETION
-        RegistreLog.objects.log_action(
+        RegisterLog.objects.log_action(
             content_type=self.__content_type__(),
             object_pk=self.pk,
             object_repr=str(self),
@@ -129,7 +129,7 @@ class ModelWithLog(models.Model):
     objects = ManagerWithLog()
 
 
-class RegistreLogManager(models.Manager):
+class RegisterLogManager(models.Manager):
 
     use_in_migrations = True
 
@@ -162,7 +162,7 @@ class RegistreLogManager(models.Manager):
         )
 
 
-class RegistreLog(models.Model):
+class RegisterLog(models.Model):
     action_time = models.DateTimeField(
         _('action time'),
         default=timezone.now,
@@ -182,7 +182,7 @@ class RegistreLog(models.Model):
     action_flag = models.PositiveSmallIntegerField(_('action flag'))
     change_message = models.TextField(_('change message'), blank=True)
 
-    objects = RegistreLogManager()
+    objects = RegisterLogManager()
 
     class Meta:
         verbose_name = _('log entry')
@@ -224,7 +224,7 @@ class RegistreLog(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk is None:
-            super(RegistreLog, self).save(*args, **kwargs)
+            super(RegisterLog, self).save(*args, **kwargs)
         else:
             raise PermissionDenied("You can not change the registry log.")
 

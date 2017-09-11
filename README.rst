@@ -3,7 +3,7 @@ django-modelwithlog
 
 django-modelwithlog is a reusable Django Abstract Model that make automatic history log of your model.
 
-The History of all model will write in a Model RegistreLog compose of:
+The History of all model will write in a Model RegisterLog compose of:
 
     action_time:
         date and time of ocurrency
@@ -39,9 +39,9 @@ Installation
 Usage
 -----
 
-Add `log_models` to your `SETTINGS.INSTALLED_APPS`.
+Add 'log_models' to your 'SETTINGS.INSTALLED_APPS'.
 
-Inherit your model from `ModelWithLog` to make it auto logged:
+Inherit your model from 'ModelWithLog' to make it auto logged:
 
 
 .. code-block:: python
@@ -53,7 +53,6 @@ Inherit your model from `ModelWithLog` to make it auto logged:
         name = models.CharField(max_length=80)
         age = models.PositiveSmallIntegerField()
 
-
 Advanced Usage
 --------------
 
@@ -61,6 +60,8 @@ Advanced Usage
 
     from django.db import models
     from log_models.models import ModelWithLog
+    from log_models.models import RegisterLog
+    from django.contrib.contenttypes.models import ContentType
 
     class Player(ModelWithLog):
         name = models.CharField(max_length=80)
@@ -75,6 +76,8 @@ Advanced Usage
             else:
                 return f"The Player change for {self.nome} and age {self.age}."
 
+        def get_logs(self):
+            return RegisterLog.objects.filter(content_type=ContentType(Player), object_pk=self.pk)
 
 Compatibility
 --------------

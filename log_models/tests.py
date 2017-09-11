@@ -5,7 +5,7 @@ from django.test import TestCase
 from model_mommy import mommy
 from django.db import models
 # from model_mommy.recipe import Recipe, foreign_key
-from log_models.models import RegistreLog
+from log_models.models import RegisterLog
 # from log_models.serializer_model import serializer_generic_models
 # from .models import GenericModel
 from django.core.management import call_command
@@ -65,13 +65,13 @@ class LogTestModel(TestCase):
             'text': 'kaghslkahl'
         }
         obj_created = GenericModel.objects.create(**data)
-        register = RegistreLog.objects.filter(object_pk=obj_created.pk).last()
+        register = RegisterLog.objects.filter(object_pk=obj_created.pk).last()
         for key in data:
             self.assertEqual(register.modifications['fields'][key], data[key])
 
     def test_can_save_new_data_with_log(self):
         obj_created = mommy.make(GenericModel, **{'name': 'Lion'})
-        r = RegistreLog.objects.filter(object_pk=obj_created.pk).last()
+        r = RegisterLog.objects.filter(object_pk=obj_created.pk).last()
         self.assertTrue(r.action_flag, 1)
         for field in GenericModel._meta.get_fields():
             if field.name != 'id':
@@ -93,9 +93,9 @@ class LogTestModel(TestCase):
         obj_created = mommy.make(GenericModel, **{'name': 'Lion'})
         obj_created.name = 'Panthro'
         obj_created.save()
-        nreg = RegistreLog.objects.filter(object_pk=obj_created.pk).count()
+        nreg = RegisterLog.objects.filter(object_pk=obj_created.pk).count()
         self.assertEqual(nreg, 2)
-        r = RegistreLog.objects.filter(object_pk=obj_created.pk).last()
+        r = RegisterLog.objects.filter(object_pk=obj_created.pk).last()
         self.assertTrue(r.action_flag, 2)
         self.assertTrue('name' in r.modifications['fields'].keys())
         print(repr(r))
@@ -106,7 +106,7 @@ class LogTestModel(TestCase):
         # obj_created.save()
         obj_pk = obj_created.pk
         obj_created.delete()
-        nreg = RegistreLog.objects.filter(object_pk=obj_pk).count()
+        nreg = RegisterLog.objects.filter(object_pk=obj_pk).count()
         self.assertEqual(nreg, 2)
-        r = RegistreLog.objects.filter(object_pk=obj_created.pk).last()
+        r = RegisterLog.objects.filter(object_pk=obj_created.pk).last()
         self.assertTrue(r.action_flag, 3)
