@@ -38,7 +38,7 @@ class TestCommand(Command):
 setup(
     name='django-modelwithlog',
     version='0.9.0',
-    packages=['django-modelwithlog', 'jsonfield'],
+    packages=['jsonfield'],
     license='MIT',
     include_package_data=True,
     author='Bispo',
