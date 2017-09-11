@@ -4,14 +4,30 @@ django-modelwithlog
 django-modelwithlog is a reusable Django Abstract Model that make automatic history log of your model.
 
 The History of all model will write in a Model RegistreLog compose of:
-    action_time:  date and time of ocurrency
-    content_type: The ContentType of the concrect Model
-    data_user: A JSON of user data loged on ocurrency
-    modifications: A JSON with a data of model modificate
-    object_pk: The primary key of model
-    object_repr: The representation of model
-    action_flag: The action of ocurrency (ADDITION, CHANGE or DELETION)
-    change_message: The message of ocurrency of human read
+
+    action_time:
+        date and time of ocurrency
+
+    content_type:
+        The ContentType of the concrect Model
+
+    data_user:
+        A JSON of user data loged on ocurrency
+
+    modifications:
+        A JSON with a data of model modificate
+
+    object_pk:
+        The primary key of model
+
+    object_repr:
+        The representation of model
+
+    action_flag:
+        The action of ocurrency (ADDITION, CHANGE or DELETION)
+
+    change_message:
+        The message of ocurrency of human read
 
 Installation
 ------------
@@ -22,6 +38,11 @@ Installation
 
 Usage
 -----
+
+Add `log_models` to your `SETTINGS.INSTALLED_APPS`.
+
+Inherit your model from `ModelWithLog` to make it auto logged:
+
 
 .. code-block:: python
 
@@ -50,8 +71,6 @@ Advanced Usage
                 return f"Player {self.nome} is gone."
             else:
                 return f"The Player change for {self.nome} and age {self.age}."
-                
-    
 
 Compatibility
 --------------
