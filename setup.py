@@ -38,7 +38,7 @@ class TestCommand(Command):
 setup(
     name='django-modelwithlog',
     version='0.9.0',
-    packages=['django-jsonfield'],
+    packages=['log_models'],
     license='MIT',
     include_package_data=True,
     author='Bispo',
@@ -46,7 +46,7 @@ setup(
     url='https://github.com/bispogeomk/ModelWithLog/',
     description='A reusable Django Model that allows you to store registre actions log of models.',
     long_description=open("README.rst").read(),
-    install_requires=['Django >= 1.8.0'],
+    install_requires=['Django >= 1.8.0', 'jsonfield'],
     tests_require=['Django >= 1.8.0'],
     cmdclass={'test': TestCommand},
     classifiers=[
