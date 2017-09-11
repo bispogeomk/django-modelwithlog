@@ -60,7 +60,7 @@ Advanced Usage
 .. code-block:: python
 
     from django.db import models
-    from log_models import ModelWithLog
+    from log_models.models import ModelWithLog
 
     class Player(ModelWithLog):
         name = models.CharField(max_length=80)
