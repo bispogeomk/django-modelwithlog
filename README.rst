@@ -56,6 +56,9 @@ Inherit your model from `ModelWithLog` to make it auto logged:
 
 Advanced Usage
 --------------
+
+.. code-block:: python
+
     from django.db import models
     from log_models import ModelWithLog
 
@@ -71,6 +74,7 @@ Advanced Usage
                 return f"Player {self.nome} is gone."
             else:
                 return f"The Player change for {self.nome} and age {self.age}."
+
 
 Compatibility
 --------------
