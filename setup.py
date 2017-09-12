@@ -14,7 +14,37 @@ class TestCommand(Command):
     def run(self):
         from django.conf import settings
         settings.configure(
-            DATABASES={'default': {'NAME': ':memory:', 'ENGINE': 'django.db.backends.sqlite3'}},
+            DATABASES={'default': {'NAME': ':memory:',
+                                   'ENGINE': 'django.db.backends.sqlite3'}},
+            INSTALLED_APPS=(
+                'django.contrib.auth',
+                'django.contrib.contenttypes',
+                'log_models',
+                'log_models.model_test',
+                'jsonfield')
+        )
+        from django.core.management import call_command
+        import django
+        django.setup()
+        call_command('makemigrations')
+        call_command('migrate')
+        call_command('test', 'log_models')
+
+
+class ShellCommand(Command):
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        from django.conf import settings
+        settings.configure(
+            DATABASES={'default': {'NAME': ':memory:',
+                                   'ENGINE': 'django.db.backends.sqlite3'}},
             INSTALLED_APPS=(
                 'django.contrib.auth',
                 'django.contrib.contenttypes',
@@ -25,15 +55,12 @@ class TestCommand(Command):
         )
         from django.core.management import call_command
         import django
-
-        if django.VERSION[:2] >= (1, 7):
-            django.setup()
-        
-        # call_command('shell_plus')
+        django.setup()
         call_command('makemigrations')
         call_command('migrate')
-        call_command('test', 'log_models')
-        
+        call_command('shell_plus')
+
+
 
 setup(
     name='django-modelwithlog',
@@ -43,16 +70,18 @@ setup(
     include_package_data=True,
     author='Bispo',
     author_email='bispo@geomk.com.br',
-    url='https://github.com/bispogeomk/ModelWithLog/',
+    url='https://github.com/bispogeomk/django-modelwithlog/',
     description='A reusable Django Model that allows you to store registre actions log of models.',
     long_description=open("README.rst").read(),
     install_requires=['Django >= 1.8.0', 'jsonfield'],
     tests_require=['Django >= 1.8.0'],
-    cmdclass={'test': TestCommand},
+    cmdclass={'test': TestCommand, 'shell': ShellCommand},
     classifiers=[
+        'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
+        'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
