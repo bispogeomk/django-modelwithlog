@@ -32,7 +32,11 @@ The History of all model will write in a Model RegisterLog compose of:
 Installation
 ------------
 
-.. code-block:: python
+.. code-block:: shell
+
+    pip install django-modelwithlog
+
+    or
 
     pip install git+https://github.com/bispogeomk/django-modelwithlog
 
