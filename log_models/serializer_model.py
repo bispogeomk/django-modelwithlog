@@ -1,23 +1,31 @@
 # -*- coding: utf-8 *-*
 import json
-
 from django.core import serializers
-from django.forms.models import model_to_dict
-from django.contrib.auth.models import User
-# from rest_framework.utils import encoders
-# from log_models.midleware.put_request_in_thread_locals import get_current_user
 
 
 def serializer_generic_models(obj, fields=None):
-    array_result = serializers.serialize('json', [obj], ensure_ascii=False, fields=fields)
+    array_result = serializers.serialize(
+        'json', [obj], ensure_ascii=False, fields=fields)
     return json.loads(array_result[1:-1])
 
 
 def serializer_user(user):
-    data_user = model_to_dict(user)
     return {
-        'username': data_user.pop('username'),
-        'first_name': data_user.pop('first_name'),
-        'last_name': data_user.pop('last_name'),
-        'email': data_user.pop('email')
+        'pk': str(user.pk),
+        'username': str(user.username),
+        'first_name': str(user.first_name),
+        'last_name': str(user.last_name),
+        'email': str(user.email)
+    }
+
+
+def serializer_request_acess(request):
+    if request is None:
+        return {'method': "shell"}
+    return {
+        'method': str(request.method),
+        'path_info': str(request.path_info),
+        'REMOTE_HOST': str(request.META.get('REMOTE_HOST')),
+        'REMOTE_ADDR': str(request.META.get('REMOTE_ADDR')),
+        'HTTP_USER_AGENT': str(request.META.get('HTTP_USER_AGENT'))
     }

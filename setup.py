@@ -21,11 +21,20 @@ class TestCommand(Command):
                 'django.contrib.contenttypes',
                 'log_models',
                 'log_models.model_test',
-                'jsonfield')
+                'jsonfield'),
+            MIDDLEWARE=[
+                'django.middleware.security.SecurityMiddleware',
+                'django.contrib.sessions.middleware.SessionMiddleware',
+                'django.middleware.common.CommonMiddleware',
+                'django.middleware.csrf.CsrfViewMiddleware',
+                'django.contrib.auth.middleware.AuthenticationMiddleware',
+                'django.contrib.messages.middleware.MessageMiddleware',
+                'threadlocals.middleware.ThreadLocalMiddleware',
+            ]
         )
-        from django.core.management import call_command
         import django
         django.setup()
+        from django.core.management import call_command
         call_command('makemigrations')
         call_command('migrate')
         call_command('test', 'log_models')
@@ -51,11 +60,20 @@ class ShellCommand(Command):
                 'log_models',
                 'log_models.model_test',
                 'jsonfield',
-                'django_extensions')
+                'django_extensions'),
+            MIDDLEWARE=[
+                'django.middleware.security.SecurityMiddleware',
+                'django.contrib.sessions.middleware.SessionMiddleware',
+                'django.middleware.common.CommonMiddleware',
+                'django.middleware.csrf.CsrfViewMiddleware',
+                'django.contrib.auth.middleware.AuthenticationMiddleware',
+                'django.contrib.messages.middleware.MessageMiddleware',
+                'threadlocals.middleware.ThreadLocalMiddleware',
+            ]
         )
-        from django.core.management import call_command
         import django
         django.setup()
+        from django.core.management import call_command
         call_command('makemigrations')
         call_command('migrate')
         call_command('shell_plus')
@@ -64,17 +82,19 @@ class ShellCommand(Command):
 
 setup(
     name='django-modelwithlog',
-    version='0.9.0',
-    packages=['log_models'],
+    version='1.0.0',
+    packages=['log_models', 'log_models.migrations'],
     license='MIT',
     include_package_data=True,
     author='Bispo',
     author_email='bispo@geomk.com.br',
     url='https://github.com/bispogeomk/django-modelwithlog/',
-    description='A reusable Django Model that allows you to store registre actions log of models.',
+    description=('A reusable Django Model that allows you to store'
+                 'registre actions log of models.'),
     long_description=open("README.rst").read(),
-    install_requires=['Django >= 1.8.0', 'jsonfield'],
-    tests_require=['Django >= 1.8.0'],
+    install_requires=['Django >= 1.8.0', 'jsonfield', 'django-threadlocals'],
+    tests_require=['Django >= 1.8.0', 'jsonfield', 'django-threadlocals',
+                   'mock'],
     cmdclass={'test': TestCommand, 'shell': ShellCommand},
     classifiers=[
         'Development Status :: 4 - Beta',

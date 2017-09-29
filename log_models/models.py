@@ -1,22 +1,21 @@
 # -*- coding: utf-8 *-*
-
 from django.core.exceptions import PermissionDenied
 from django.contrib.admin.utils import quote
-# from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import NoReverseMatch, reverse
 from django.db import models
 from django.forms import model_to_dict
 from django.utils import timezone
 from django.utils.encoding import smart_text
-# from django.utils.translation import ugettext
 from django.utils.translation import ugettext_lazy as _
 from jsonfield import JSONField
 from django.db import transaction
 from log_models.serializer_model import serializer_user
+from log_models.serializer_model import serializer_request_acess
 from log_models.serializer_model import serializer_generic_models
+from threadlocals.threadlocals import get_current_user
+from threadlocals.threadlocals import get_current_request
 
-# TODO - TALVEZ POSSA VIRAR UMA TABELA NO BANCO
 
 ACTION_ADDITION = 1
 ACTION_CHANGE = 2
@@ -53,9 +52,9 @@ class ModelWithLog(models.Model):
                 serial_old = model_to_dict(self.__old__)
                 serial_new = model_to_dict(self)
                 keys = []
-                for key in serial_old.keys():
+                for key in serial_new.keys():
                     if hasattr(serial_old[key], 'get_internal_type'):
-                        mytype = serial_old[key].get_internal_type()
+                        mytype = serial_new[key].get_internal_type()
                         if mytype == 'FileField':
                             if str(serial_old[key]) != str(serial_new[key]):
                                 keys.append(key)
@@ -65,8 +64,6 @@ class ModelWithLog(models.Model):
                     else:
                         if serial_old[key] != serial_new[key]:
                             keys.append(key)
-                # Partial
-                print("Partial:", self.pk, keys)
                 return serializer_generic_models(self, keys)
         return serializer_generic_models(self)
 
@@ -100,7 +97,8 @@ class ModelWithLog(models.Model):
         self.full_clean()
         flag_msg = self.flag_msg.get(self.__action_flag__)
         if self.__old__:
-            msg = '{0} "{1}" to "{2}"'.format(flag_msg, repr(self.__old__), repr(self))
+            msg = '{0} "{1}" to "{2}"'.format(
+                flag_msg, repr(self.__old__), repr(self))
         else:
             msg = '{0} "{1}"'.format(flag_msg, repr(self))
         return msg
@@ -114,6 +112,7 @@ class ModelWithLog(models.Model):
         change_message = kwargs.pop('change_message', '')
         self.save_with_log(action_flag, change_message, *args, **kwargs)
 
+    @transaction.atomic
     def delete(self, *args, **kwargs):
         self.__action_flag__ = ACTION_DELETION
         RegisterLog.objects.log_action(
@@ -123,7 +122,6 @@ class ModelWithLog(models.Model):
             action_flag=ACTION_DELETION,
             modifications=serializer_generic_models(self),
             change_message=self.make_log_message())
-
         super(ModelWithLog, self).delete(*args, **kwargs)
 
     objects = ManagerWithLog()
@@ -135,24 +133,28 @@ class RegisterLogManager(models.Manager):
 
     def log_action(self, content_type, object_pk, object_repr, action_flag,
                    modifications, user=None, change_message=''):
-        # user = get_current_user()
+        if user is None:
+            user = get_current_user()
+        # the current user is None on shell
         if user is None:
             data_user = {
+                'pk': None,
                 'username': None,
                 'full_name': None,
                 'email': None
             }
         elif user.is_anonymous():
             data_user = {
+                'pk': None,
                 'username': _('Anonymous'),
                 'full_name': _('Anonymous'),
                 'email': ''
             }
         else:
             data_user = serializer_user(user)
-
+        data_acess = serializer_request_acess(get_current_request())
         self.model.objects.create(
-            data_user=data_user,
+            data_user={'user': data_user, 'acess': data_acess},
             content_type=content_type,
             object_pk=smart_text(object_pk),
             object_repr=str(object_repr)[:200],
@@ -176,7 +178,6 @@ class RegisterLog(models.Model):
     )
     data_user = JSONField()  # dados do usuario logado
     modifications = JSONField()  # chave e valor só dos campos modificados
-    # action_flag = models.CharField(max_length=40)
     object_pk = models.TextField(_('object id'), blank=True, null=True)
     object_repr = models.CharField(_('object repr'), max_length=200)
     action_flag = models.PositiveSmallIntegerField(_('action flag'))

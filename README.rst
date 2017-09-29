@@ -12,7 +12,7 @@ The History of all model will write in a Model RegisterLog compose of:
         The ContentType of the concrect Model
 
     data_user:
-        A JSON of user data loged on ocurrency
+        A JSON of user and acess data loged on ocurrency
 
     modifications:
         A JSON with a data of model modificate
@@ -29,24 +29,25 @@ The History of all model will write in a Model RegisterLog compose of:
     change_message:
         The message of ocurrency of human read
 
-Installation
-------------
+Setup/Usage
+===========
 
 .. code-block:: shell
 
     pip install django-modelwithlog
 
-    or
+or
+
+.. code-block:: shell
 
     pip install git+https://github.com/bispogeomk/django-modelwithlog
 
-Usage
------
+
+Add `threadlocals.middleware.ThreadLocalMiddleware` to your `MIDDLEWARE_CLASSES` setting.
 
 Add 'log_models' to your 'SETTINGS.INSTALLED_APPS'.
 
 Inherit your model from 'ModelWithLog' to make it auto logged:
-
 
 .. code-block:: python
 
