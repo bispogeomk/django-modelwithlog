@@ -10,6 +10,9 @@ class TestCommand(Command):
 
     def finalize_options(self):
         pass
+    
+    def fake_json(self):
+        return [{'teste': 1}, {'item': 2}, 5, 4, '6']
 
     def run(self):
         from django.conf import settings
@@ -30,7 +33,10 @@ class TestCommand(Command):
                 'django.contrib.auth.middleware.AuthenticationMiddleware',
                 'django.contrib.messages.middleware.MessageMiddleware',
                 'threadlocals.middleware.ThreadLocalMiddleware',
-            ]
+            ],
+            MOMMY_CUSTOM_FIELDS_GEN = {
+                'jsonfield.fields.JSONField': self.fake_json,
+            }
         )
         import django
         django.setup()
@@ -82,7 +88,7 @@ class ShellCommand(Command):
 
 setup(
     name='django-modelwithlog',
-    version='1.0.0',
+    version='1.0.1',
     packages=['log_models', 'log_models.migrations'],
     license='MIT',
     include_package_data=True,
@@ -93,8 +99,8 @@ setup(
                  'registre actions log of models.'),
     long_description=open("README.rst").read(),
     install_requires=['Django >= 1.8.0', 'jsonfield', 'django-threadlocals'],
-    tests_require=['Django >= 1.8.0', 'jsonfield', 'django-threadlocals',
-                   'mock'],
+    tests_require=['Django >= 1.8.0', 'jsonfield', 'django-threadlocals', 'model_mommy',
+                   'mock', 'django_extensions', 'jsonfield'],
     cmdclass={'test': TestCommand, 'shell': ShellCommand},
     classifiers=[
         'Development Status :: 4 - Beta',

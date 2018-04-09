@@ -9,6 +9,8 @@ from threadlocals.middleware import ThreadLocalMiddleware
 from threadlocals.threadlocals import get_current_user
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.models import User
+from jsonfield import JSONField
+import json
 from mock import Mock
 
 
@@ -27,12 +29,18 @@ class LogTestModel(TestCase):
             'name': 'ThunderCats',
             'number': 5,
             'real': 25,
-            'text': 'kaghslkahl'
+            'text': 'kaghslkahl',
+            'json': {'1': 'bispo', '3': 'teste'}
         }
         obj_created = GenericModel.objects.create(**data)
         register = RegisterLog.objects.filter(object_pk=obj_created.pk).last()
         for key in data:
-            self.assertEqual(register.modifications['fields'][key], data[key])
+            if key == 'json':
+                self.assertEqual(json.loads(
+                    register.modifications['fields'][key]), data[key])
+            else:
+                self.assertEqual(
+                    register.modifications['fields'][key], data[key])
 
     def test_can_save_new_data_with_log(self):
         obj_created = mommy.make(GenericModel, **{'name': 'Lion'})
@@ -50,6 +58,10 @@ class LogTestModel(TestCase):
                         reg.modifications['fields'][field.name].replace('T',
                                                                         ' '),
                         str(getattr(obj_created, field.name))[0:-3])
+                elif isinstance(field, JSONField):
+                    self.assertEqual(
+                        json.loads(reg.modifications['fields'][field.name]),
+                        getattr(obj_created, field.name))
                 else:
                     self.assertEqual(
                         reg.modifications['fields'][field.name],
