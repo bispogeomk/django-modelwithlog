@@ -88,7 +88,7 @@ class ShellCommand(Command):
 
 setup(
     name='django-modelwithlog',
-    version='1.0.1',
+    version='1.0.2',
     packages=['log_models', 'log_models.migrations'],
     license='MIT',
     include_package_data=True,
