@@ -2,7 +2,12 @@
 from django.core.exceptions import PermissionDenied
 from django.contrib.admin.utils import quote
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import NoReverseMatch, reverse
+try:
+    # before django 2.0
+    from django.core.urlresolvers import NoReverseMatch, reverse
+except ImportError:
+    # django 2.0+
+    from django.urls import NoReverseMatch, reverse
 from django.db import models
 from django.forms import model_to_dict
 from django.utils import timezone
